@@ -3,65 +3,308 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login – iBlue Uganda</title>
+  <title>Sign In – iBlue Uganda</title>
 
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fb;min-height:100vh;display:flex;align-items:center;justify-content:center}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-    .card{background:#fff;width:100%;max-width:420px;padding:28px;border-radius:16px;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
 
-    h1{text-align:center;margin-bottom:18px}
+    .card {
+      background: white;
+      width: 100%;
+      max-width: 440px;
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      animation: slideUp 0.5s ease;
+    }
 
-    .field{margin-bottom:12px}
-    input{width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;font-size:14px}
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-    button{width:100%;padding:12px;border:none;border-radius:12px;background:#2563eb;color:#fff;font-weight:bold;font-size:15px;cursor:pointer}
-    button.secondary{background:#f0f9ff;color:#2563eb;border:1px solid #2563eb;margin-top:8px}
-    button.google-btn{background:#fff;color:#333;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:8px}
-    button.google-btn:hover{background:#f8f8f8}
+    h1 {
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 32px;
+      color: #1a1a1a;
+    }
 
-    button:disabled{opacity:.6;cursor:not-allowed}
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 32px;
+      font-size: 15px;
+    }
 
-    .divider{display:flex;align-items:center;margin:20px 0;color:#666;font-size:14px}
-    .divider::before,.divider::after{content:"";flex:1;border-bottom:1px solid #ddd}
-    .divider span{margin:0 12px}
+    .field {
+      margin-bottom: 16px;
+    }
 
-    .link{text-align:center;margin-top:12px;font-size:14px}
-    .link a{color:#2563eb;text-decoration:none;font-weight:500}
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: #333;
+      font-size: 14px;
+      font-weight: 500;
+    }
 
-    .msg{margin-top:10px;text-align:center;font-size:14px}
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 2px solid #e0e0e0;
+      font-size: 15px;
+      transition: all 0.2s;
+      background: #fafafa;
+    }
 
-    /* Modal styles */
-    .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center}
-    .modal-card{background:#fff;width:90%;max-width:420px;padding:28px;border-radius:16px;position:relative}
-    .modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:#666;width:auto;padding:0}
+    input:focus {
+      border-color: #667eea;
+      background: white;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
 
-    @media(max-width:420px){
-      body{padding:14px}
-      .card{padding:20px}
-      .modal-card{padding:20px}
+    input::placeholder {
+      color: #999;
+    }
+
+    .password-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .forgot-link {
+      color: #667eea;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .forgot-link:hover {
+      color: #5a67d8;
+      text-decoration: underline;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: #667eea;
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button:hover {
+      background: #5a67d8;
+      transform: translateY(-1px);
+      box-shadow: 0 7px 14px rgba(102,126,234,0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .google-btn {
+      background: white;
+      color: #333;
+      border: 2px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+      font-weight: 600;
+    }
+
+    .google-btn:hover {
+      background: #f8f9fa;
+      border-color: #667eea;
+      box-shadow: none;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 24px 0;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .divider span {
+      margin: 0 16px;
+      color: #999;
+    }
+
+    .signup-prompt {
+      text-align: center;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid #e0e0e0;
+      color: #666;
+      font-size: 15px;
+    }
+
+    .signup-prompt a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
+    .signup-prompt a:hover {
+      text-decoration: underline;
+    }
+
+    .msg {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      display: none;
+    }
+
+    .msg.show {
+      display: block;
+    }
+
+    .msg.success {
+      background: #f0fdf4;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+
+    .msg.error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .msg.info {
+      background: #eff6ff;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .button-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 30px 20px;
+      }
     }
   </style>
 </head>
 <body>
-
   <div class="card">
-    <h1>Login</h1>
+    <h1>Welcome back</h1>
+    <div class="subtitle">Sign in to your iBlue account</div>
 
+    <!-- Email Input -->
     <div class="field">
-      <input id="email" type="email" placeholder="Email" />
+      <label>Email address</label>
+      <input 
+        id="email" 
+        type="email" 
+        placeholder="you@example.com" 
+        autocomplete="email"
+      />
     </div>
 
+    <!-- Password Input with Forgot Link -->
     <div class="field">
-      <input id="password" type="password" placeholder="Password" />
+      <div class="password-header">
+        <label>Password</label>
+        <a href="#" class="forgot-link" onclick="resetPassword()">Forgot password?</a>
+      </div>
+      <input 
+        id="password" 
+        type="password" 
+        placeholder="Enter your password" 
+        autocomplete="current-password"
+      />
     </div>
 
-    <button id="loginBtn" onclick="login()">Sign In</button>
+    <!-- Sign In Button -->
+    <button id="loginBtn" onclick="login()">
+      <span class="button-content">
+        <span>Sign In</span>
+      </span>
+    </button>
 
-    <div class="divider"><span>OR</span></div>
+    <!-- Divider -->
+    <div class="divider">
+      <span>OR</span>
+    </div>
 
-    <!-- Google Sign-In Button -->
+    <!-- Google Sign In Button -->
     <button class="google-btn" onclick="signInWithGoogle()">
       <svg width="20" height="20" viewBox="0 0 24 24">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -72,426 +315,404 @@
       Continue with Google
     </button>
 
-    <div class="divider"><span>New to iBlue?</span></div>
-
-    <button class="secondary" onclick="showRegisterModal()">Create your iBlue account</button>
-
-    <div class="link">
-      <a href="#" onclick="resetPassword()">Forgot password?</a>
+    <!-- Sign Up Prompt -->
+    <div class="signup-prompt">
+      Don't have an account?
+      <a href="register.html">Create account</a>
     </div>
 
-    <div class="msg" id="msg"></div>
-  </div>
-
-  <!-- Registration Modal -->
-  <div id="registerModal" class="modal">
-    <div class="modal-card">
-      <button class="modal-close" onclick="hideRegisterModal()">×</button>
-      <h1>Create Account</h1>
-      
-      <div class="field">
-        <input id="regName" type="text" placeholder="Full Name" />
-      </div>
-      
-      <div class="field">
-        <input id="regEmail" type="email" placeholder="Email" />
-      </div>
-
-      <div class="field">
-        <input id="regPassword" type="password" placeholder="Password" />
-      </div>
-
-      <div class="field">
-        <input id="regConfirmPassword" type="password" placeholder="Confirm Password" />
-      </div>
-
-      <button id="registerBtn" onclick="register()">Create Account</button>
-      
-      <div class="divider"><span>OR</span></div>
-      
-      <button class="google-btn" onclick="signInWithGoogle()">
-        <svg width="20" height="20" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-        </svg>
-        Continue with Google
-      </button>
-      
-      <div class="link" style="margin-top: 16px;">
-        Already have an account? <a href="#" onclick="switchToLogin()">Sign in</a>
-      </div>
-
-      <div class="msg" id="regMsg"></div>
-    </div>
+    <!-- Message Container -->
+    <div id="msg" class="msg"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    // ============================================
+    // SUPABASE CONFIGURATION - VERIFY THESE!
+    // ============================================
     const supabaseUrl = "https://uufhvmmgwzkxvvdbqemz.supabase.co";
     const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1Zmh2bW1nd3preHZ2ZGJxZW16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzMDIzNTYsImV4cCI6MjA4NTg3ODM1Nn0.WABHx4ilFRkhPHP-y4ZC4E8Kb7PRqY-cyxI8cVS8Tyc";
-    const sb = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const sb = window.supabase.createClient(supabaseUrl, supabaseKey, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      }
+    });
 
+    // ============================================
+    // DOM ELEMENTS
+    // ============================================
     const msg = document.getElementById("msg");
-    const regMsg = document.getElementById("regMsg");
     const loginBtn = document.getElementById("loginBtn");
-    const registerBtn = document.getElementById("registerBtn");
-    const registerModal = document.getElementById("registerModal");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
 
-    // FIXED: Simplified and more reliable return URL system
-    function getReturnUrl() {
-      const urlParams = new URLSearchParams(window.location.search);
+    // ============================================
+    // UI HELPER FUNCTIONS
+    // ============================================
+    function showMessage(text, type = 'error') {
+      msg.textContent = text;
+      msg.className = 'msg show ' + type;
       
-      // Check for returnUrl parameter first
-      let returnUrl = urlParams.get('returnUrl');
-      
-      if (returnUrl) {
-        console.log("Found returnUrl in query params:", returnUrl);
-        return returnUrl;
+      // Auto hide after 5 seconds for success messages
+      if (type === 'success') {
+        setTimeout(() => {
+          msg.classList.remove('show');
+        }, 5000);
       }
-      
-      // Check for redirect parameter
-      returnUrl = urlParams.get('redirect');
-      if (returnUrl) {
-        console.log("Found redirect in query params:", returnUrl);
-        return returnUrl;
-      }
-      
-      // Check session storage
-      const storedReturnUrl = sessionStorage.getItem('returnUrl');
-      if (storedReturnUrl) {
-        console.log("Found returnUrl in sessionStorage:", storedReturnUrl);
-        sessionStorage.removeItem('returnUrl');
-        return storedReturnUrl;
-      }
-      
-      // Check localStorage as fallback
-      const localStorageUrl = localStorage.getItem('returnUrl');
-      if (localStorageUrl) {
-        console.log("Found returnUrl in localStorage:", localStorageUrl);
-        localStorage.removeItem('returnUrl');
-        return localStorageUrl;
-      }
-      
-      // Default to index.html
-      console.log("No return URL found, defaulting to index.html");
-      return './index.html';
     }
 
-    // Store return URL before navigating to registration
-    function prepareRegistrationRedirect() {
-      const returnUrl = getReturnUrl();
-      // Store in both localStorage and sessionStorage for redundancy
-      localStorage.setItem('returnUrl', returnUrl);
-      sessionStorage.setItem('returnUrl', returnUrl);
-      console.log("Stored return URL for registration:", returnUrl);
-      return returnUrl;
-    }
-
-    function showMessage(element, text, color="red"){
-      element.style.color = color;
-      element.textContent = text;
-    }
-
-    function showRegisterModal() {
-      // Store where to return after registration
-      prepareRegistrationRedirect();
-      registerModal.style.display = 'flex';
-      showMessage(regMsg, '', 'transparent');
-    }
-
-    function hideRegisterModal() {
-      registerModal.style.display = 'none';
-    }
-
-    function switchToLogin() {
-      hideRegisterModal();
-      document.getElementById('email').focus();
-    }
-
-    // Google Sign-In function
-    async function signInWithGoogle() {
-      try {
-        showMessage(msg, "Redirecting to Google...", "#555");
-        
-        // Store return URL before OAuth redirect
-        const returnUrl = getReturnUrl();
-        localStorage.setItem('returnUrl', returnUrl);
-        sessionStorage.setItem('returnUrl', returnUrl);
-        
-        const { data, error } = await sb.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: window.location.origin + '/login.html',
-            queryParams: {
-              access_type: 'offline',
-              prompt: 'consent'
-            }
-          }
-        });
-        
-        if (error) {
-          console.error("Google sign-in error:", error);
-          showMessage(msg, error.message);
+    function setLoading(button, isLoading) {
+      if (isLoading) {
+        button.disabled = true;
+        const originalText = button.innerHTML;
+        button.dataset.originalText = originalText;
+        button.innerHTML = `
+          <span class="button-content">
+            <span class="loading-spinner"></span>
+            <span>Please wait...</span>
+          </span>
+        `;
+      } else {
+        button.disabled = false;
+        if (button.dataset.originalText) {
+          button.innerHTML = button.dataset.originalText;
         }
-      } catch (error) {
-        console.error("Google sign-in exception:", error);
-        showMessage(msg, "Failed to sign in with Google");
       }
     }
 
-    // FIXED: Improved login function with better debugging
-    async function login(){
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
+    // ============================================
+    // RETURN URL HANDLING (WORKS EVERYWHERE)
+    // ============================================
+    function getReturnUrl() {
+      // 1. Check URL parameters first
+      const urlParams = new URLSearchParams(window.location.search);
+      let returnUrl = urlParams.get('returnUrl') || urlParams.get('redirect');
+      
+      if (returnUrl) {
+        // Validate it's a relative URL or same origin
+        if (returnUrl.startsWith('http')) {
+          try {
+            const url = new URL(returnUrl);
+            if (url.origin === window.location.origin) {
+              return url.pathname + url.search + url.hash;
+            }
+          } catch {
+            // Invalid URL, ignore
+          }
+        } else {
+          return returnUrl;
+        }
+      }
+      
+      // 2. Check storage
+      returnUrl = sessionStorage.getItem('returnUrl') || localStorage.getItem('returnUrl');
+      if (returnUrl) {
+        // Clear it
+        sessionStorage.removeItem('returnUrl');
+        localStorage.removeItem('returnUrl');
+        return returnUrl;
+      }
+      
+      // 3. Check referrer
+      if (document.referrer && 
+          document.referrer !== window.location.href && 
+          !document.referrer.includes('login') && 
+          !document.referrer.includes('register')) {
+        return document.referrer;
+      }
+      
+      // 4. Default
+      return '/dashboard.html';
+    }
 
-      if(!email || !password) {
-        showMessage(msg, "Enter email and password");
+    // ============================================
+    // EMAIL/PASSWORD LOGIN
+    // ============================================
+    async function login() {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if (!email || !password) {
+        showMessage('Please enter your email and password');
+        emailInput.focus();
         return;
       }
 
-      loginBtn.disabled = true;
-      showMessage(msg, "Signing in...","#555");
+      if (!email.includes('@') || !email.includes('.')) {
+        showMessage('Please enter a valid email address');
+        emailInput.focus();
+        return;
+      }
 
-      console.log("Attempting login for:", email);
-      
+      if (password.length < 6) {
+        showMessage('Password must be at least 6 characters');
+        passwordInput.focus();
+        return;
+      }
+
+      setLoading(loginBtn, true);
+      showMessage('Signing in...', 'info');
+
       try {
         const { data, error } = await sb.auth.signInWithPassword({ 
           email, 
           password 
         });
 
-        loginBtn.disabled = false;
-
-        if(error) {
-          console.error("Login error:", error);
-          showMessage(msg, error.message);
+        if (error) {
+          setLoading(loginBtn, false);
+          
+          // User-friendly error messages
+          if (error.message.includes('Invalid login credentials')) {
+            showMessage('Incorrect email or password');
+          } else if (error.message.includes('Email not confirmed')) {
+            showMessage('Please verify your email address first');
+          } else {
+            showMessage(error.message);
+          }
           return;
         }
 
-        console.log("Login successful for user:", data.user?.email);
-        showMessage(msg, "Login successful! Redirecting...","green");
+        // Success!
+        showMessage('Login successful! Redirecting...', 'success');
         
-        // Get the return URL
-        const returnUrl = getReturnUrl();
-        console.log("Redirecting to:", returnUrl);
+        // Store user info if needed
+        if (data.user) {
+          localStorage.setItem('userEmail', data.user.email);
+        }
         
-        // Force redirect after short delay
+        // Redirect
         setTimeout(() => {
+          const returnUrl = getReturnUrl();
           window.location.href = returnUrl;
         }, 1000);
-        
+
       } catch (error) {
-        loginBtn.disabled = false;
-        console.error("Login exception:", error);
-        showMessage(msg, "An error occurred. Please try again.");
+        setLoading(loginBtn, false);
+        showMessage('An error occurred. Please try again.');
+        console.error('Login error:', error);
       }
     }
 
-    async function register(){
-      const name = document.getElementById("regName").value.trim();
-      const email = document.getElementById("regEmail").value.trim();
-      const password = document.getElementById("regPassword").value.trim();
-      const confirmPassword = document.getElementById("regConfirmPassword").value.trim();
-
-      // Validation
-      if(!name || !email || !password || !confirmPassword) {
-        showMessage(regMsg, "Please fill all fields");
-        return;
-      }
-
-      if(password !== confirmPassword) {
-        showMessage(regMsg, "Passwords don't match");
-        return;
-      }
-
-      if(password.length < 6) {
-        showMessage(regMsg, "Password must be at least 6 characters");
-        return;
-      }
-
-      registerBtn.disabled = true;
-      showMessage(regMsg, "Creating account...","#555");
-
-      console.log("Attempting registration for:", email);
-      
+    // ============================================
+    // GOOGLE SIGN IN - PRODUCTION READY ✅
+    // ============================================
+    async function signInWithGoogle() {
       try {
-        // 1. Sign up the user
-        const { data: authData, error: authError } = await sb.auth.signUp({
-          email,
-          password,
+        showMessage('Redirecting to Google...', 'info');
+        
+        // Get the current environment URL - WORKS ON LOCALHOST & PRODUCTION
+        const currentOrigin = window.location.origin;
+        
+        // IMPORTANT: Use the EXACT URL that's in your Supabase redirect whitelist
+        const redirectTo = `${currentOrigin}/login.html`;
+        
+        console.log('🚀 Google Sign In - Environment:', currentOrigin);
+        console.log('📌 Redirect URL:', redirectTo);
+        
+        // Store return URL before redirect
+        const returnUrl = getReturnUrl();
+        sessionStorage.setItem('returnUrl', returnUrl);
+        localStorage.setItem('returnUrl', returnUrl);
+
+        // Initiate Google OAuth
+        const { data, error } = await sb.auth.signInWithOAuth({
+          provider: 'google',
           options: {
-            data: {
-              full_name: name,
-              email: email
+            redirectTo: redirectTo,
+            queryParams: {
+              access_type: 'offline',
+              prompt: 'consent'
             },
-            emailRedirectTo: window.location.origin // For email confirmation
+            scopes: 'email profile'
           }
         });
 
-        if(authError) {
-          registerBtn.disabled = false;
-          console.error("Registration error:", authError);
-          showMessage(regMsg, authError.message);
-          return;
+        if (error) {
+          console.error('❌ Google sign-in error:', error);
+          showMessage(error.message);
         }
 
-        console.log("Registration response:", authData);
-        
-        // 2. Check if email confirmation is required
-        if (authData.user && authData.session) {
-          // User is automatically logged in (email confirmations disabled)
-          showMessage(regMsg, "Account created successfully! Redirecting...","green");
-          
-          // Get return URL
-          const returnUrl = localStorage.getItem('returnUrl') || 
-                           sessionStorage.getItem('returnUrl') ||
-                           './index.html';
-          
-          console.log("Registration redirect to:", returnUrl);
-          
-          // Clean up stored URLs
-          localStorage.removeItem('returnUrl');
-          sessionStorage.removeItem('returnUrl');
-          
-          // Redirect
-          setTimeout(() => {
-            window.location.href = returnUrl;
-          }, 1500);
-          
-        } else if (authData.user && !authData.session) {
-          // Email confirmation required
-          showMessage(regMsg, "Check your email to confirm your account","green");
-          setTimeout(() => {
-            hideRegisterModal();
-            document.getElementById('email').value = email;
-            document.getElementById('email').focus();
-            showMessage(msg, "Please confirm your email, then sign in","green");
-          }, 2000);
-          registerBtn.disabled = false;
-        }
+        // No need to handle success - browser redirects to Google
 
       } catch (error) {
-        registerBtn.disabled = false;
-        console.error("Registration exception:", error);
-        showMessage(regMsg, "An error occurred. Please try again.");
+        console.error('❌ Google sign-in exception:', error);
+        showMessage('Unable to connect to Google. Please try again.');
       }
     }
 
-    async function resetPassword(){
-      const email = document.getElementById("email").value.trim();
-      if(!email) {
-        showMessage(msg, "Enter your email first");
+    // ============================================
+    // PASSWORD RESET
+    // ============================================
+    async function resetPassword(e) {
+      if (e) e.preventDefault();
+      
+      const email = emailInput.value.trim();
+      
+      if (!email) {
+        showMessage('Please enter your email address');
+        emailInput.focus();
         return;
       }
 
-      showMessage(msg, "Sending reset email...","#555");
-      
+      if (!email.includes('@')) {
+        showMessage('Please enter a valid email address');
+        emailInput.focus();
+        return;
+      }
+
+      setLoading(loginBtn, true);
+      showMessage('Sending reset email...', 'info');
+
       try {
         const { error } = await sb.auth.resetPasswordForEmail(email, {
-          redirectTo: window.location.origin + '/reset-password.html'
+          redirectTo: `${window.location.origin}/reset-password.html`
         });
 
-        if(error) {
-          console.error("Reset password error:", error);
-          showMessage(msg, error.message);
+        setLoading(loginBtn, false);
+
+        if (error) {
+          showMessage(error.message);
           return;
         }
 
-        showMessage(msg, "Password reset email sent. Check your inbox.","green");
+        showMessage('✅ Password reset link sent! Check your email.', 'success');
+        
       } catch (error) {
-        console.error("Reset password exception:", error);
-        showMessage(msg, "An error occurred. Please try again.");
+        setLoading(loginBtn, false);
+        showMessage('Failed to send reset email');
+        console.error('Reset error:', error);
       }
     }
-    
-    // Handle OAuth redirect response
-    async function handleOAuthRedirect() {
+
+    // ============================================
+    // HANDLE OAUTH REDIRECT (GOOGLE CALLBACK)
+    // ============================================
+    async function handleAuthRedirect() {
       try {
-        const { data, error } = await sb.auth.getSession();
+        // Check if this is an OAuth callback
+        const hasHash = window.location.hash;
+        const hasCode = new URLSearchParams(window.location.search).has('code');
         
-        if (error) {
-          console.error("OAuth session error:", error);
-          return;
-        }
-        
-        if (data.session) {
-          console.log("OAuth login successful for:", data.session.user.email);
-          showMessage(msg, "Login successful! Redirecting...", "green");
+        if (hasHash || hasCode) {
+          console.log('🔄 Processing OAuth callback...');
+          showMessage('Completing sign in...', 'info');
           
-          const returnUrl = getReturnUrl();
-          setTimeout(() => {
-            window.location.href = returnUrl;
-          }, 1000);
+          const { data, error } = await sb.auth.getSession();
+          
+          if (error) {
+            console.error('❌ OAuth session error:', error);
+            showMessage(error.message);
+            return;
+          }
+          
+          if (data.session) {
+            console.log('✅ Google sign-in successful:', data.session.user.email);
+            
+            // Create/update profile for Google user
+            const userId = data.session.user.id;
+            const userEmail = data.session.user.email;
+            const userName = data.session.user.user_metadata?.full_name || 
+                            data.session.user.user_metadata?.name || 
+                            data.session.user.email?.split('@')[0] || 
+                            'User';
+            
+            try {
+              await sb.from('profiles').upsert({
+                id: userId,
+                email: userEmail,
+                full_name: userName,
+                last_sign_in: new Date().toISOString()
+              }, { 
+                onConflict: 'id',
+                ignoreDuplicates: false 
+              });
+            } catch (profileError) {
+              console.error('⚠️ Profile update error:', profileError);
+              // Continue anyway - auth succeeded
+            }
+            
+            showMessage('✓ Signed in successfully! Redirecting...', 'success');
+            
+            // Clean URL (remove OAuth params)
+            window.history.replaceState({}, document.title, window.location.pathname);
+            
+            // Redirect
+            setTimeout(() => {
+              const returnUrl = getReturnUrl();
+              window.location.href = returnUrl;
+            }, 1000);
+          }
         }
       } catch (error) {
-        console.error("OAuth redirect handling error:", error);
+        console.error('❌ Auth redirect handler error:', error);
       }
     }
-    
-    // FIXED: Better session storage initialization
-    document.addEventListener('DOMContentLoaded', async function() {
-      console.log("Login page loaded");
-      
-      const urlParams = new URLSearchParams(window.location.search);
-      
-      // Store any provided return URL
-      const returnUrl = urlParams.get('returnUrl') || urlParams.get('redirect');
-      if (returnUrl) {
-        sessionStorage.setItem('returnUrl', returnUrl);
-        localStorage.setItem('returnUrl', returnUrl);
-        console.log("Stored return URL from query params:", returnUrl);
-      }
-      
-      // If no return URL in query params, check referrer
-      else if (document.referrer && 
-               document.referrer !== window.location.href &&
-               !document.referrer.includes('login.html') &&
-               !document.referrer.includes('register.html')) {
-        sessionStorage.setItem('returnUrl', document.referrer);
-        localStorage.setItem('returnUrl', document.referrer);
-        console.log("Stored return URL from referrer:", document.referrer);
-      }
-      
-      // Check if user is already logged in (prevent login page access)
-      await checkAuthStatus();
-      
-      // Handle OAuth redirect
-      await handleOAuthRedirect();
-    });
-    
-    // Check if user is already authenticated
-    async function checkAuthStatus() {
+
+    // ============================================
+    // CHECK EXISTING SESSION
+    // ============================================
+    async function checkExistingSession() {
       try {
         const { data } = await sb.auth.getSession();
+        
         if (data.session) {
-          console.log("User already logged in, redirecting...");
-          const returnUrl = getReturnUrl();
-          window.location.href = returnUrl;
+          console.log('👤 User already logged in:', data.session.user.email);
+          
+          // Don't redirect if we're on the login page (prevent loops)
+          if (!window.location.pathname.includes('login.html')) {
+            const returnUrl = getReturnUrl();
+            window.location.href = returnUrl;
+          }
         }
       } catch (error) {
-        console.log("Auth check:", error.message);
+        console.error('Session check error:', error);
       }
     }
 
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-      if (event.target == registerModal) {
-        hideRegisterModal();
-      }
-    }
-    
-    // Allow form submission with Enter key
-    document.addEventListener('keypress', function(event) {
-      if (event.key === 'Enter') {
-        if (registerModal.style.display === 'flex') {
-          register();
-        } else {
-          login();
-        }
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('🚀 iBlue Login Page Loaded');
+      console.log('📍 Environment:', window.location.origin);
+      
+      // Check for existing session
+      await checkExistingSession();
+      
+      // Handle OAuth redirect if this is a callback
+      await handleAuthRedirect();
+      
+      // Focus email input
+      emailInput.focus();
+      
+      // Check for email parameter (from registration)
+      const urlParams = new URLSearchParams(window.location.search);
+      const email = urlParams.get('email');
+      if (email) {
+        emailInput.value = email;
+        passwordInput.focus();
+        showMessage('Account created! Please sign in.', 'success');
       }
     });
+
+    // ============================================
+    // ENTER KEY SUBMIT
+    // ============================================
+    document.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        login();
+      }
+    });
+
+    // ============================================
+    // MAKE FUNCTIONS GLOBAL
+    // ============================================
+    window.login = login;
+    window.signInWithGoogle = signInWithGoogle;
+    window.resetPassword = resetPassword;
   </script>
 </body>
 </html>
