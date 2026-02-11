@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login – iBlue Uganda</title>
+
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fb;min-height:100vh;display:flex;align-items:center;justify-content:center}
+
+    .card{background:#fff;width:100%;max-width:420px;padding:28px;border-radius:16px;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+
+    h1{text-align:center;margin-bottom:18px}
+
+    .field{margin-bottom:12px}
+    input{width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;font-size:14px}
+
+    button{width:100%;padding:12px;border:none;border-radius:12px;background:#2563eb;color:#fff;font-weight:bold;font-size:15px;cursor:pointer}
+    button.secondary{background:#f0f9ff;color:#2563eb;border:1px solid #2563eb;margin-top:8px}
+
+    button:disabled{opacity:.6;cursor:not-allowed}
+
+    .divider{display:flex;align-items:center;margin:20px 0;color:#666;font-size:14px}
+    .divider::before,.divider::after{content:"";flex:1;border-bottom:1px solid #ddd}
+    .divider span{margin:0 12px}
+
+    .link{text-align:center;margin-top:12px;font-size:14px}
+    .link a{color:#2563eb;text-decoration:none;font-weight:500}
+
+    .msg{margin-top:10px;text-align:center;font-size:14px}
+
+    /* Modal styles */
+    .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center}
+    .modal-card{background:#fff;width:90%;max-width:420px;padding:28px;border-radius:16px;position:relative}
+    .modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:#666;width:auto;padding:0}
+
+    @media(max-width:420px){
+      body{padding:14px}
+      .card{padding:20px}
+      .modal-card{padding:20px}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>Login</h1>
+
+    <div class="field">
+      <input id="email" type="email" placeholder="Email" />
+    </div>
+
+    <div class="field">
+      <input id="password" type="password" placeholder="Password" />
+    </div>
+
+    <button id="loginBtn" onclick="login()">Sign In</button>
+
+    <div class="divider"><span>New to iBlue?</span></div>
+
+    <button class="secondary" onclick="showRegisterModal()">Create your iBlue account</button>
+
+    <div class="link">
+      <a href="#" onclick="resetPassword()">Forgot password?</a>
+    </div>
+
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <!-- Registration Modal -->
+  <div id="registerModal" class="modal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="hideRegisterModal()">×</button>
+      <h1>Create Account</h1>
+      
+      <div class="field">
+        <input id="regName" type="text" placeholder="Full Name" />
+      </div>
+      
+      <div class="field">
+        <input id="regEmail" type="email" placeholder="Email" />
+      </div>
+
+      <div class="field">
+        <input id="regPassword" type="password" placeholder="Password" />
+      </div>
+
+      <div class="field">
+        <input id="regConfirmPassword" type="password" placeholder="Confirm Password" />
+      </div>
+
+      <button id="registerBtn" onclick="register()">Create Account</button>
+      
+      <div class="link" style="margin-top: 16px;">
+        Already have an account? <a href="#" onclick="switchToLogin()">Sign in</a>
+      </div>
+
+      <div class="msg" id="regMsg"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseUrl = "https://uufhvmmgwzkxvvdbqemz.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1Zmh2bW1nd3preHZ2ZGJxZW16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzMDIzNTYsImV4cCI6MjA4NTg3ODM1Nn0.WABHx4ilFRkhPHP-y4ZC4E8Kb7PRqY-cyxI8cVS8Tyc";
+    const sb = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    const msg = document.getElementById("msg");
+    const regMsg = document.getElementById("regMsg");
+    const loginBtn = document.getElementById("loginBtn");
+    const registerBtn = document.getElementById("registerBtn");
+    const registerModal = document.getElementById("registerModal");
+
+    // FIXED: Simplified and more reliable return URL system
+    function getReturnUrl() {
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      // Check for returnUrl parameter first
+      let returnUrl = urlParams.get('returnUrl');
+      
+      if (returnUrl) {
+        console.log("Found returnUrl in query params:", returnUrl);
+        return returnUrl;
+      }
+      
+      // Check for redirect parameter
+      returnUrl = urlParams.get('redirect');
+      if (returnUrl) {
+        console.log("Found redirect in query params:", returnUrl);
+        return returnUrl;
+      }
+      
+      // Check session storage
+      const storedReturnUrl = sessionStorage.getItem('returnUrl');
+      if (storedReturnUrl) {
+        console.log("Found returnUrl in sessionStorage:", storedReturnUrl);
+        sessionStorage.removeItem('returnUrl');
+        return storedReturnUrl;
+      }
+      
+      // Check localStorage as fallback
+      const localStorageUrl = localStorage.getItem('returnUrl');
+      if (localStorageUrl) {
+        console.log("Found returnUrl in localStorage:", localStorageUrl);
+        localStorage.removeItem('returnUrl');
+        return localStorageUrl;
+      }
+      
+      // Default to index.html
+      console.log("No return URL found, defaulting to index.html");
+      return './index.html';
+    }
+
+    // Store return URL before navigating to registration
+    function prepareRegistrationRedirect() {
+      const returnUrl = getReturnUrl();
+      // Store in both localStorage and sessionStorage for redundancy
+      localStorage.setItem('returnUrl', returnUrl);
+      sessionStorage.setItem('returnUrl', returnUrl);
+      console.log("Stored return URL for registration:", returnUrl);
+      return returnUrl;
+    }
+
+    function showMessage(element, text, color="red"){
+      element.style.color = color;
+      element.textContent = text;
+    }
+
+    function showRegisterModal() {
+      // Store where to return after registration
+      prepareRegistrationRedirect();
+      registerModal.style.display = 'flex';
+      showMessage(regMsg, '', 'transparent');
+    }
+
+    function hideRegisterModal() {
+      registerModal.style.display = 'none';
+    }
+
+    function switchToLogin() {
+      hideRegisterModal();
+      document.getElementById('email').focus();
+    }
+
+    // FIXED: Improved login function with better debugging
+    async function login(){
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if(!email || !password) {
+        showMessage(msg, "Enter email and password");
+        return;
+      }
+
+      loginBtn.disabled = true;
+      showMessage(msg, "Signing in...","#555");
+
+      console.log("Attempting login for:", email);
+      
+      try {
+        const { data, error } = await sb.auth.signInWithPassword({ 
+          email, 
+          password 
+        });
+
+        loginBtn.disabled = false;
+
+        if(error) {
+          console.error("Login error:", error);
+          showMessage(msg, error.message);
+          return;
+        }
+
+        console.log("Login successful for user:", data.user?.email);
+        showMessage(msg, "Login successful! Redirecting...","green");
+        
+        // Get the return URL
+        const returnUrl = getReturnUrl();
+        console.log("Redirecting to:", returnUrl);
+        
+        // Force redirect after short delay
+        setTimeout(() => {
+          window.location.href = returnUrl;
+        }, 1000);
+        
+      } catch (error) {
+        loginBtn.disabled = false;
+        console.error("Login exception:", error);
+        showMessage(msg, "An error occurred. Please try again.");
+      }
+    }
+
+    async function register(){
+      const name = document.getElementById("regName").value.trim();
+      const email = document.getElementById("regEmail").value.trim();
+      const password = document.getElementById("regPassword").value.trim();
+      const confirmPassword = document.getElementById("regConfirmPassword").value.trim();
+
+      // Validation
+      if(!name || !email || !password || !confirmPassword) {
+        showMessage(regMsg, "Please fill all fields");
+        return;
+      }
+
+      if(password !== confirmPassword) {
+        showMessage(regMsg, "Passwords don't match");
+        return;
+      }
+
+      if(password.length < 6) {
+        showMessage(regMsg, "Password must be at least 6 characters");
+        return;
+      }
+
+      registerBtn.disabled = true;
+      showMessage(regMsg, "Creating account...","#555");
+
+      console.log("Attempting registration for:", email);
+      
+      try {
+        // 1. Sign up the user
+        const { data: authData, error: authError } = await sb.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: name,
+              email: email
+            },
+            emailRedirectTo: window.location.origin // For email confirmation
+          }
+        });
+
+        if(authError) {
+          registerBtn.disabled = false;
+          console.error("Registration error:", authError);
+          showMessage(regMsg, authError.message);
+          return;
+        }
+
+        console.log("Registration response:", authData);
+        
+        // 2. Check if email confirmation is required
+        if (authData.user && authData.session) {
+          // User is automatically logged in (email confirmations disabled)
+          showMessage(regMsg, "Account created successfully! Redirecting...","green");
+          
+          // Get return URL
+          const returnUrl = localStorage.getItem('returnUrl') || 
+                           sessionStorage.getItem('returnUrl') ||
+                           './index.html';
+          
+          console.log("Registration redirect to:", returnUrl);
+          
+          // Clean up stored URLs
+          localStorage.removeItem('returnUrl');
+          sessionStorage.removeItem('returnUrl');
+          
+          // Redirect
+          setTimeout(() => {
+            window.location.href = returnUrl;
+          }, 1500);
+          
+        } else if (authData.user && !authData.session) {
+          // Email confirmation required
+          showMessage(regMsg, "Check your email to confirm your account","green");
+          setTimeout(() => {
+            hideRegisterModal();
+            document.getElementById('email').value = email;
+            document.getElementById('email').focus();
+            showMessage(msg, "Please confirm your email, then sign in","green");
+          }, 2000);
+          registerBtn.disabled = false;
+        }
+
+      } catch (error) {
+        registerBtn.disabled = false;
+        console.error("Registration exception:", error);
+        showMessage(regMsg, "An error occurred. Please try again.");
+      }
+    }
+
+    async function resetPassword(){
+      const email = document.getElementById("email").value.trim();
+      if(!email) {
+        showMessage(msg, "Enter your email first");
+        return;
+      }
+
+      showMessage(msg, "Sending reset email...","#555");
+      
+      try {
+        const { error } = await sb.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + '/reset-password.html'
+        });
+
+        if(error) {
+          console.error("Reset password error:", error);
+          showMessage(msg, error.message);
+          return;
+        }
+
+        showMessage(msg, "Password reset email sent. Check your inbox.","green");
+      } catch (error) {
+        console.error("Reset password exception:", error);
+        showMessage(msg, "An error occurred. Please try again.");
+      }
+    }
+    
+    // FIXED: Better session storage initialization
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("Login page loaded");
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      // Store any provided return URL
+      const returnUrl = urlParams.get('returnUrl') || urlParams.get('redirect');
+      if (returnUrl) {
+        sessionStorage.setItem('returnUrl', returnUrl);
+        localStorage.setItem('returnUrl', returnUrl);
+        console.log("Stored return URL from query params:", returnUrl);
+      }
+      
+      // If no return URL in query params, check referrer
+      else if (document.referrer && 
+               document.referrer !== window.location.href &&
+               !document.referrer.includes('login.html') &&
+               !document.referrer.includes('register.html')) {
+        sessionStorage.setItem('returnUrl', document.referrer);
+        localStorage.setItem('returnUrl', document.referrer);
+        console.log("Stored return URL from referrer:", document.referrer);
+      }
+      
+      // Check if user is already logged in (prevent login page access)
+      checkAuthStatus();
+    });
+    
+    // Check if user is already authenticated
+    async function checkAuthStatus() {
+      try {
+        const { data } = await sb.auth.getSession();
+        if (data.session) {
+          console.log("User already logged in, redirecting...");
+          const returnUrl = getReturnUrl();
+          window.location.href = returnUrl;
+        }
+      } catch (error) {
+        console.log("Auth check:", error.message);
+      }
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      if (event.target == registerModal) {
+        hideRegisterModal();
+      }
+    }
+    
+    // Allow form submission with Enter key
+    document.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        if (registerModal.style.display === 'flex') {
+          register();
+        } else {
+          login();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
