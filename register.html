@@ -18,6 +18,12 @@
 
     button{width:100%;padding:12px;border:none;border-radius:12px;background:#16a34a;color:#fff;font-weight:bold;font-size:15px;cursor:pointer}
     button:disabled{opacity:.6;cursor:not-allowed}
+    button.google-btn{background:#fff;color:#333;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:8px}
+    button.google-btn:hover{background:#f8f8f8}
+
+    .divider{display:flex;align-items:center;margin:20px 0;color:#666;font-size:14px}
+    .divider::before,.divider::after{content:"";flex:1;border-bottom:1px solid #ddd}
+    .divider span{margin:0 12px}
 
     .link{text-align:center;margin-top:12px;font-size:14px}
     .link a{color:#2563eb;text-decoration:none}
@@ -53,6 +59,19 @@
 
     <button id="registerBtn" onclick="register()">Register</button>
 
+    <div class="divider"><span>OR</span></div>
+
+    <!-- Google Sign-In Button -->
+    <button class="google-btn" onclick="signInWithGoogle()">
+      <svg width="20" height="20" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      Continue with Google
+    </button>
+
     <div class="link">
       Already have an account? <a href="login.html">Login</a>
     </div>
@@ -74,6 +93,32 @@
       msg.textContent = text;
     }
 
+    // Google Sign-In function
+    async function signInWithGoogle() {
+      try {
+        showMessage("Redirecting to Google...", "#555");
+        
+        const { data, error } = await sb.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin + '/login.html',
+            queryParams: {
+              access_type: 'offline',
+              prompt: 'consent'
+            }
+          }
+        });
+        
+        if (error) {
+          console.error("Google sign-in error:", error);
+          showMessage(error.message);
+        }
+      } catch (error) {
+        console.error("Google sign-in exception:", error);
+        showMessage("Failed to sign in with Google");
+      }
+    }
+
     async function register(){
       const full_name = document.getElementById("name").value.trim();
       const email = document.getElementById("email").value.trim();
@@ -86,7 +131,16 @@
       btn.disabled = true;
       showMessage("Creating account...","#555");
 
-      const { data, error } = await sb.auth.signUp({ email, password });
+      const { data, error } = await sb.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          data: {
+            full_name: full_name,
+            phone: phone
+          }
+        }
+      });
 
       if(error){
         btn.disabled = false;
@@ -96,21 +150,97 @@
       const userId = data.user?.id;
 
       if(userId){
-        await sb.from("profiles").insert({
+        const { error: profileError } = await sb.from("profiles").insert({
           id: userId,
           email,
           phone,
           full_name
         });
+        
+        if (profileError) {
+          console.error("Profile creation error:", profileError);
+          // Still continue - user created but profile failed
+        }
       }
 
       btn.disabled = false;
-      showMessage("Account created. Check your email to verify.","green");
-
-      setTimeout(()=>{
-        window.location.href = "login.html";
-      },1200);
+      
+      if (data.session) {
+        // User is automatically logged in (email confirmations disabled)
+        showMessage("Account created successfully! Redirecting...", "green");
+        setTimeout(()=>{
+          window.location.href = "dashboard.html"; // or wherever you want to redirect
+        },1200);
+      } else {
+        // Email confirmation required
+        showMessage("Account created. Check your email to verify.", "green");
+        setTimeout(()=>{
+          window.location.href = "login.html";
+        },2000);
+      }
     }
+
+    // Handle OAuth redirect response
+    async function handleOAuthRedirect() {
+      try {
+        const { data, error } = await sb.auth.getSession();
+        
+        if (error) {
+          console.error("OAuth session error:", error);
+          return;
+        }
+        
+        if (data.session) {
+          console.log("OAuth login successful for:", data.session.user.email);
+          showMessage("Login successful! Redirecting...", "green");
+          
+          // Check if we need to create/update profile for Google user
+          const userId = data.session.user.id;
+          const userEmail = data.session.user.email;
+          const userName = data.session.user.user_metadata?.full_name || 
+                          data.session.user.user_metadata?.name || 
+                          'Google User';
+          
+          // Try to create/update profile for Google user
+          try {
+            const { error: profileError } = await sb.from("profiles").upsert({
+              id: userId,
+              email: userEmail,
+              full_name: userName,
+              phone: '' // Google doesn't provide phone
+            }, { onConflict: 'id' });
+            
+            if (profileError) {
+              console.error("Profile upsert error:", profileError);
+            }
+          } catch (profileError) {
+            console.error("Profile creation error:", profileError);
+          }
+          
+          setTimeout(() => {
+            window.location.href = "dashboard.html"; // Redirect to dashboard or home
+          }, 1000);
+        }
+      } catch (error) {
+        console.error("OAuth redirect handling error:", error);
+      }
+    }
+
+    // Check for OAuth redirect on page load
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Check if this is an OAuth redirect
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('provider') || window.location.hash) {
+        await handleOAuthRedirect();
+      }
+      
+      // Check if user is already logged in
+      const { data } = await sb.auth.getSession();
+      if (data.session) {
+        console.log("User already logged in, redirecting...");
+        window.location.href = "dashboard.html";
+      }
+    });
   </script>
 </body>
 </html>
